@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <base href="https://www.codebluecollectives.studio">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Explore ethical decision-making in healthcare through an immersive hospital simulation game that challenges players with real-time triage and resource management." />
+    <title>Cinematic Game Studio Website</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="styles.css" />
+<script>
+const navToggle = document.querySelector(".nav-toggle");
+const nav = document.querySelector(".site-nav");
+
+navToggle?.addEventListener("click", () => {
+  const isOpen = nav?.classList.toggle("is-open");
+  navToggle.setAttribute("aria-expanded", String(Boolean(isOpen)));
+});
+
+nav?.addEventListener("click", (event) => {
+  if (event.target instanceof HTMLAnchorElement) {
+    nav.classList.remove("is-open");
+    navToggle?.setAttribute("aria-expanded", "false");
+  }
+});
+</script>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #05070b;
+  --surface: #0b1118;
+  --text: #f3f8fb;
+  --muted: #a6b5c4;
+  --blue: #1b7cff;
+  --green: #58d68d;
+  --yellow: #ffd166;
+  --red: #ff5d65;
+  --line: rgba(143, 190, 255, 0.22);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(27, 124, 255, 0.22), transparent 34rem),
+    radial-gradient(circle at 86% 28%, rgba(255, 93, 101, 0.12), transparent 28rem),
+    linear-gradient(180deg, #030509 0%, var(--bg) 42%, #07101a 100%);
+  color: var(--text);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,.72), transparent 70%);
+}
+
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+h1, h2, h3, h4, p { margin-top: 0; }
+
+.site-header {
+  position: fixed;
+  z-index: 20;
+  inset: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px clamp(20px, 4vw, 56px);
+  background: rgba(5, 7, 11, .74);
+  border-bottom: 1px solid rgba(143, 190, 255, .16);
+  backdrop-filter: blur(18px);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  width: 178px;
+  height: 48px;
+}
+
+.brand-logo {
+  display: none;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: left center;
+  filter: drop-shadow(0 0 18px rgba(27, 124, 255, .28));
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.site-nav a {
+  padding: 10px 14px;
+  color: var(--muted);
+  font-size: .86rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  transition: color .18s ease, background .18s ease;
+}
+
+.site-nav a:hover {
+  color: white;
+  background: rgba(27, 124, 255, .12);
+}
+
+.nav-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: rgba(255,255,255,.04);
+}
+
+.nav-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  margin: 4px auto;
+  background: white;
+}
+
+.hero {
+  position: relative;
+  min-height: 92svh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 450px);
+  align-items: end;
+  gap: clamp(28px, 4vw, 72px);
+  padding: 132px clamp(20px, 6vw, 80px) 84px;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url("https://images.unsplash.com/photo-1504813184591-01572f98c85f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlbWVyZ2VuY3klMjBob3NwaXRhbCUyMG9wZXJhdGlvbiUyMG1lZGljYWwlMjBkcmFtYXRpY3xlbnwxfHx8fDE3Nzg5OTk2MzB8MA&ixlib=rb-4.1.0&q=80&w=1080");
+  background-size: cover;
+  background-position: center;
+  filter: saturate(.96) contrast(1.1);
+  transform: scale(1.02);
+}
+
+.hero-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(3,5,9,.95), rgba(3,5,9,.76) 43%, rgba(3,5,9,.38)),
+    linear-gradient(0deg, rgba(3,5,9,.97), transparent 42%, rgba(3,5,9,.22));
+}
+
+.hero-content,
+.monitor {
+  position: relative;
+  z-index: 4;
+}
+
+.eyebrow {
+  margin-bottom: 18px;
+  color: var(--blue);
+  font-size: .78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.red-text { color: var(--red); }
+
+h1 {
+  max-width: 11ch;
+  margin-bottom: 24px;
+  font-size: clamp(4rem, 11vw, 9.5rem);
+  line-height: .86;
+  text-transform: uppercase;
+}
+
+h2 {
+  margin-bottom: 18px;
+  font-size: clamp(2.4rem, 5vw, 5.1rem);
+  line-height: .95;
+  text-transform: uppercase;
+}
+
+h3 {
+  margin-bottom: 14px;
+  font-size: clamp(1.35rem, 2vw, 2rem);
+  line-height: 1.08;
+}
+
+h4 { margin-bottom: 8px; font-size: 1.08rem; }
+
+.hero-content p,
+.section-head p,
+.contact-card > p {
+  max-width: 760px;
+  color: var(--muted);
+  font-size: clamp(1.05rem, 1.8vw, 1.28rem);
+  line-height: 1.65;
+}
+
+.hero-content p { margin-bottom: 34px; }
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.actions.center { justify-content: center; }
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  font-weight: 850;
+  text-transform: uppercase;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.button:hover { transform: translateY(-2px); }
+.button.primary { background: var(--blue); box-shadow: 0 18px 46px rgba(27,124,255,.26); }
+.button.ghost { border-color: rgba(143,190,255,.46); background: rgba(6,13,24,.55); }
+
+.monitor {
+  align-self: center;
+  padding: 24px;
+  border: 1px solid rgba(88, 214, 141, .34);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(7,18,23,.86), rgba(5,9,14,.7));
+  box-shadow: 0 24px 80px rgba(0,0,0,.45), inset 0 0 42px rgba(88,214,141,.07);
+}
+
+.monitor-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--green);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .88rem;
+  font-weight: 800;
+}
+
+.monitor-row i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 20px var(--green);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.monitor svg {
+  width: 100%;
+  height: 132px;
+  margin: 18px 0;
+  border-top: 1px solid rgba(88,214,141,.14);
+  border-bottom: 1px solid rgba(88,214,141,.14);
+}
+
+.monitor path {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 8px rgba(88,214,141,.9));
+  stroke-dasharray: 620;
+  animation: draw 2.4s ease-in-out infinite;
+}
+
+.section {
+  position: relative;
+  z-index: 4;
+  padding: clamp(72px, 10vw, 132px) clamp(20px, 6vw, 80px);
+  border-top: 1px solid rgba(143,190,255,.12);
+}
+
+.section-head {
+  max-width: 860px;
+  margin: 0 auto 48px;
+  text-align: center;
+}
+
+.section-head p { margin-left: auto; margin-right: auto; }
+
+.project-logo {
+  width: min(620px, 92vw);
+  max-height: 210px;
+  margin: 0 auto 26px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 22px rgba(255, 93, 101, .18)) drop-shadow(0 12px 34px rgba(0, 0, 0, .45));
+}
+
+.grid {
+  display: grid;
+  gap: 18px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.card,
+.panel,
+.team-card,
+.contact-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.02)), rgba(10,17,24,.74);
+  box-shadow: 0 18px 54px rgba(0,0,0,.24);
+}
+
+.card {
+  min-height: 220px;
+  padding: 28px;
+  border-color: color-mix(in srgb, var(--accent) 34%, transparent);
+}
+
+.card span,
+.role span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 28px;
+  border: 1px solid color-mix(in srgb, var(--accent) 46%, transparent);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
+  color: var(--accent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-weight: 900;
+}
+
+.card p,
+.role p,
+.card li,
+.team-card p,
+.footer p {
+  color: var(--muted);
+  line-height: 1.62;
+}
+
+.blue { --accent: var(--blue); }
+.green { --accent: var(--green); }
+.yellow { --accent: var(--yellow); }
+.red { --accent: var(--red); }
+
+.showcase {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr);
+  gap: 22px;
+  max-width: 1200px;
+  margin: 0 auto 22px;
+}
+
+.showcase > img {
+  width: 100%;
+  height: 100%;
+  min-height: 540px;
+  object-fit: cover;
+  border: 1px solid rgba(27,124,255,.3);
+  border-radius: 8px;
+}
+
+.panel {
+  padding: 34px;
+  background: linear-gradient(180deg, rgba(27,124,255,.12), rgba(255,255,255,.025)), rgba(7,11,17,.82);
+}
+
+.role {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 14px;
+  padding: 18px 0;
+  border-top: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+}
+
+.role span { margin: 0; }
+
+.card ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card li {
+  position: relative;
+  padding-left: 22px;
+}
+
+.card li::before {
+  content: "";
+  position: absolute;
+  top: .68em;
+  left: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+.team-card {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: clamp(28px, 6vw, 56px);
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 28px 38px;
+  align-items: center;
+}
+
+.team-card strong {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border: 1px solid rgba(27,124,255,.36);
+  border-radius: 8px;
+  background: rgba(27,124,255,.12);
+  color: var(--blue);
+  font-size: 4rem;
+  line-height: 1;
+  box-shadow: inset 0 0 40px rgba(27,124,255,.09);
+}
+
+.contact { padding-bottom: clamp(84px, 12vw, 160px); }
+
+.contact-card {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: clamp(34px, 7vw, 70px);
+  text-align: center;
+  background: linear-gradient(135deg, rgba(27,124,255,.2), rgba(255,93,101,.08) 52%, rgba(88,214,141,.1)), rgba(7,11,17,.86);
+}
+
+.contact-card p { margin-left: auto; margin-right: auto; }
+
+.footer {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 30px clamp(20px, 6vw, 80px);
+  border-top: 1px solid rgba(143,190,255,.18);
+  background: #030509;
+}
+
+.footer p { margin: 0; font-size: .9rem; }
+
+@keyframes pulse { 50% { opacity: .45; transform: scale(1.24); } }
+@keyframes draw {
+  0% { stroke-dashoffset: 620; opacity: .42; }
+  45%, 75% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: -620; opacity: .42; }
+}
+
+@media (max-width: 960px) {
+  .hero, .showcase { grid-template-columns: 1fr; }
+  .hero { min-height: auto; padding-top: 116px; }
+  .monitor { max-width: 520px; }
+  .three { grid-template-columns: 1fr; }
+  .showcase > img { min-height: 360px; }
+}
+
+@media (max-width: 760px) {
+  .site-header { padding: 14px 18px; }
+  .nav-toggle { display: block; }
+  .site-nav {
+    position: absolute;
+    top: calc(100% + 1px);
+    left: 0;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px 18px 18px;
+    background: rgba(5,7,11,.96);
+    border-bottom: 1px solid rgba(143,190,255,.16);
+  }
+  .site-nav.is-open { display: flex; }
+  .site-nav a { padding: 14px; }
+  h1 { font-size: clamp(3.3rem, 18vw, 5rem); }
+  .team-card { grid-template-columns: 1fr; }
+  .team-card strong { width: 118px; }
+  .footer { flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 520px) {
+  .brand {
+    width: 146px;
+    height: 42px;
+  }
+  .actions { flex-direction: column; }
+  .button { width: 100%; }
+  .section { padding-left: 16px; padding-right: 16px; }
+  .project-logo {
+    width: min(360px, 92vw);
+    max-height: 132px;
+  }
+  .panel { padding: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+  .footer {
+    background: #111;
+    color: #fff;
+    padding: 30px 20px;
+    text-align: center;
+  }
+
+  .footer-content {
+    max-width: 1200px;
+    margin: auto;
+  }
+
+  .social-icons {
+    margin-top: 15px;
+  }
+
+  .social-icons a {
+    color: #fff;
+    margin: 0 12px;
+    font-size: 24px;
+    transition: 0.3s ease;
+    text-decoration: none;
+  }
+
+  .social-icons a:hover {
+    color: #00bcd4;
+    transform: translateY(-3px);
+  }
+</style>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Code Blue Collectives" target="_top">
+        <img class="brand-logo" src="assets/logo.png" alt="Code Blue Collectives" />
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="site-nav">
+        <a href="#about" target="_top">About</a>
+        <a href="#game" target="_top">Game</a>
+        <a href="#tech" target="_top">Tech</a>
+        <a href="#team" target="_top">Team</a>
+        <a href="#contact" target="_top">Contact</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="hero-shade" aria-hidden="true"></div>
+        <div class="hero-content">
+          <p class="eyebrow">CODE BLUE INITIATED</p>
+          <h1>Code Blue Collectives</h1>
+          <p>Thrilling emergency medicine gameplay where every decision has real consequences. Feel the rush of life-or-death choices in our immersive hospital simulation.</p>
+          <div class="actions">
+            <a class="button primary" href="#contact" target="_top">Join Our Mission</a>
+            <a class="button ghost" href="#game" target="_top">Featured Project</a>
+          </div>
+        </div>
+        <aside class="monitor" aria-label="Emergency status">
+          <div class="monitor-row"><span>VITALS STABLE</span><i></i></div>
+          <svg viewBox="0 0 420 120" aria-hidden="true">
+            <path d="M0 63 H58 L72 63 L88 24 L108 96 L128 63 H182 L197 63 L213 39 L232 80 L250 63 H420" />
+          </svg>
+          <div class="monitor-row bottom">RESPONSE TIME: CRITICAL</div>
+        </aside>
+      </section>
+
+      <section class="section" id="about">
+        <div class="section-head">
+          <p class="eyebrow">About</p>
+          <h2>Our Mission</h2>
+          <p>Code Blue Collectives creates intense, narrative-driven simulation games that put you in the center of high-stakes decision-making. We craft entertaining experiences that challenge your choices while exploring the deeper human stories behind every emergency.</p>
+        </div>
+        <div class="grid three">
+          <article class="card blue"><span>!</span><h3>Meaningful Choices</h3><p>Every decision shapes your story. Experience gameplay where your choices create lasting consequences and unforgettable moments.</p></article>
+          <article class="card green"><span>+</span><h3>Narrative Depth</h3><p>Rich storytelling that challenges players to think beyond winning and losing.</p></article>
+          <article class="card yellow"><span>></span><h3>Immersive Gameplay</h3><p>Systems that deliver heart-pounding moments, cinematic presentation, and deeply engaging gameplay.</p></article>
+        </div>
+      </section>
+
+      <section class="section" id="game">
+        <div class="section-head">
+          <p class="eyebrow red-text">Featured Project</p>
+          <img class="project-logo" src="assets/moral-triage.png" alt="Moral Triage" />
+          <p>An intense hospital simulation game where you navigate impossible choices as a doctor, administrator, or stakeholder. Experience the adrenaline of emergency medicine, the tension of resource management, and the weight of decisions that matter.</p>
+        </div>
+        <div class="showcase">
+          <img src="https://images.unsplash.com/photo-1674049406107-f5c1e8258d4a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwyfHxtZWRpY2FsJTIwdGVjaG5vbG9neSUyMGZ1dHVyaXN0aWMlMjBoZWFsdGhjYXJlfGVufDF8fHx8MTc3ODk5OTYzMHww&ixlib=rb-4.1.0&q=80&w=1080" alt="Futuristic medical technology" />
+          <div class="panel">
+            <h3>Three Perspectives, One Truth</h3>
+            <article class="role green"><span>+</span><div><h4>Doctor</h4><p>Save lives in real-time. Make split-second triage decisions with incomplete information.</p></div></article>
+            <article class="role yellow"><span>$</span><div><h4>Administrator</h4><p>Manage limited resources. Balance budgets against human lives.</p></div></article>
+            <article class="role red"><span>!</span><div><h4>Stakeholder</h4><p>Navigate policy, public perception, and profit in a broken healthcare system.</p></div></article>
+          </div>
+        </div>
+        <div class="grid three">
+          <article class="card red"><h3>Moral Consequences</h3><p>Every decision creates ripple effects. Patients remember. Staff morale shifts. The community reacts.</p></article>
+          <article class="card yellow"><h3>Real-Time Decisions</h3><p>Emergencies don't wait. Make choices under pressure with incomplete information.</p></article>
+          <article class="card green"><h3>Resource Allocation</h3><p>Limited beds. Limited staff. Limited supplies. Who gets treatment when everyone needs it?</p></article>
+        </div>
+      </section>
+
+      <section class="section" id="tech">
+        <div class="section-head">
+          <p class="eyebrow">Tech</p>
+          <h2>Technology Stack</h2>
+          <p>Building immersive experiences with cutting-edge game development tools and AI-powered systems.</p>
+        </div>
+        <div class="grid three">
+          <article class="card blue"><h3>Game Engine</h3><ul><li>Unity</li><li>C# Scripting</li><li>Custom Simulation Systems</li></ul></article>
+          <article class="card green"><h3>3D &amp; Visual Tools</h3><ul><li>Blender</li><li>Maya</li></ul></article>
+          <article class="card yellow"><h3>AI &amp; Systems</h3><ul><li>Behavior Trees</li><li>Dialogue Systems</li><li>Procedural Generation</li><li>NavMesh</li></ul></article>
+        </div>
+      </section>
+
+      <section class="section" id="team">
+        <div class="section-head">
+          <p class="eyebrow">Team</p>
+          <h2>The Team</h2>
+          <p>A small, passionate indie studio dedicated to creating meaningful interactive experiences.</p>
+        </div>
+        <article class="team-card">
+          <strong>11</strong>
+          <div>
+            <h3>An 11-Member Team with Big Ambitions</h3>
+            <p>We're a dedicated indie studio of 11 passionate developers, designers, artists, and medical consultants working together to create unforgettable gaming experiences. From programmers to narrative designers, each team member brings unique expertise to craft games that entertain while making you think.</p>
+            <p>Interested in collaborating or joining our mission? We'd love to connect.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="section contact" id="contact">
+        <div class="contact-card">
+          <p class="eyebrow">Contact</p>
+          <h2>Join Our Mission</h2>
+          <p>Interested in collaboration, early access, or joining the team? We'd love to hear from you.</p>
+          <div class="actions center">
+            <a class="button primary" href="mailto:muzna@codebluecollectives.studio">Get in Touch</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+  <div class="footer-content">      
+    <p>© 2026 Code Blue Collectives. Building games that matter.</p>
+
+    <div class="social-icons">
+      <a href="mailto:muzna@codebluecollectives.studio" target="_blank" aria-label="Email">
+        <i class="fas fa-envelope"></i>
+      </a>
+
+      <a href="https://wa.me/923351316588" target="_blank" aria-label="WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+      </a>
+
+      <a href="https://www.linkedin.com/company/code-blue-collectives" target="_blank" aria-label="LinkedIn">
+        <i class="fab fa-linkedin"></i>
+      </a>
+
+      <a href="https://youtube.com/@CodeBlueCollectives" target="_blank" aria-label="YouTube">
+        <i class="fab fa-youtube"></i>
+      </a>
+
+      <a href="https://facebook.com/codebluecollectives" target="_blank" aria-label="Facebook">
+        <i class="fab fa-facebook"></i>
+      </a>
+
+      <a href="https://www.instagram.com/codebluecollectives?" target="_blank" aria-label="Instagram">
+        <i class="fab fa-instagram"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
